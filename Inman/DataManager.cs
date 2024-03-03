@@ -6,20 +6,49 @@ using Inman.Models;
 
 namespace Inman;
 
+/// <summary>
+/// Esta clase gestiona operaciones de datos como la inserción, actualización y eliminación
+/// de registros en la base de datos utilizando procedimientos almacenados. También proporciona
+/// métodos para recuperar listas de clientes, facturas, tipos de producto, productos y productos
+/// de factura de la base de datos.
+/// </summary>
 public class DataManager
 {
+    // Manejador de registro de eventos estático utilizado por la clase DataManager para registrar eventos.
     private static readonly LogHandler<DataManager> LogHandler = new();
+    
+    // Cadena de conexión utilizada por el DataManager para conectarse a la base de datos.
     private static string ConnectionString = string.Empty;
-
-    public DataManager(string connectionString) {
+    
+    /// <summary>
+    /// Constructor de la clase DataManager. Establece la cadena de conexión a la base de datos.
+    /// </summary>
+    /// <param name="connectionString">Cadena de conexión a la base de datos.</param>
+    public DataManager(string connectionString)
+    {
         ConnectionString = connectionString;
     }
-
+    
+    /// <summary>
+    /// Obtiene una nueva conexión a la base de datos utilizando la cadena de conexión almacenada.
+    /// </summary>
+    /// <returns>Objeto MySqlConnection que representa la conexión a la base de datos.</returns>
     private MySqlConnection GetConnection()
     {
         return new MySqlConnection(ConnectionString);
     }
 
+    /// <summary>
+    /// Inserta un nuevo cliente en la base de datos utilizando un procedimiento almacenado. La información
+    /// del cliente, incluyendo nombre, apellido, género, número de teléfono y dirección de correo electrónico
+    /// se proporcionan como parámetros. El método maneja transacciones de base de datos y registra mensajes
+    /// de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="nombre">El nombre del cliente.</param>
+    /// <param name="apellido">El apellido del cliente.</param>
+    /// <param name="sexo">El género del cliente.</param>
+    /// <param name="telefono">El número de teléfono del cliente.</param>
+    /// <param name="correo">La dirección de correo electrónico del cliente.</param>
     public void InsertarCliente(string nombre, string apellido, string sexo, string telefono,
         string correo)
     {
@@ -55,6 +84,18 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Actualiza un cliente existente en la base de datos utilizando un procedimiento almacenado.
+    /// La información del cliente, incluyendo nombre, apellido, género, número de teléfono y dirección
+    /// de correo electrónico se proporcionan como parámetros. El método maneja transacciones de base de datos
+    /// y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="id">El ID del cliente que se actualizará.</param>
+    /// <param name="newNombre">El nuevo nombre del cliente.</param>
+    /// <param name="newApellido">El nuevo apellido del cliente.</param>
+    /// <param name="newSexo">El nuevo género del cliente.</param>
+    /// <param name="newTelefono">El nuevo número de teléfono del cliente.</param>
+    /// <param name="newCorreo">La nueva dirección de correo electrónico del cliente.</param>
     public void ActualizarCliente(int id, string newNombre, string newApellido, string newSexo, string newTelefono,
         string newCorreo)
     {
@@ -91,6 +132,15 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Inserta una nueva factura en la base de datos utilizando un procedimiento almacenado.
+    /// El código de factura, el ID del cliente y el porcentaje de impuesto se proporcionan
+    /// como parámetros. El método maneja transacciones de base de datos y registra mensajes
+    /// de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="codigoFactura">El código de la factura.</param>
+    /// <param name="idCliente">El ID del cliente asociado a la factura.</param>
+    /// <param name="porcentajeImpuesto">El porcentaje de impuesto de la factura.</param>
     public void InsertarFactura(string codigoFactura, int idCliente, int porcentajeImpuesto)
     {
         using MySqlConnection connection = GetConnection();
@@ -122,6 +172,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Inserta un nuevo tipo de producto en la base de datos utilizando un procedimiento almacenado.
+    /// El nombre del tipo de producto se proporciona como parámetro. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="nombreTipoProducto">El nombre del tipo de producto.</param>
     public void InsertarTipoProducto(string nombreTipoProducto)
     {
         using MySqlConnection connection = GetConnection();
@@ -153,6 +209,17 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Inserta un nuevo producto en la base de datos utilizando un procedimiento almacenado.
+    /// El código del producto, el ID del tipo de producto, el nombre del producto, el precio y
+    /// el porcentaje de descuento se proporcionan como parámetros. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="codigoProducto">El código del producto.</param>
+    /// <param name="idTipoProducto">El ID del tipo de producto.</param>
+    /// <param name="nombreProducto">El nombre del producto.</param>
+    /// <param name="precio">El precio del producto.</param>
+    /// <param name="porcentajeDescuento">El porcentaje de descuento del producto.</param>
     public void InsertarProducto(string codigoProducto, int idTipoProducto, string nombreProducto, decimal precio,
         int porcentajeDescuento)
     {
@@ -187,6 +254,14 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Relaciona un producto con una factura en la base de datos utilizando un procedimiento almacenado.
+    /// El código de factura, el código de producto y el precio se proporcionan como parámetros. El método maneja
+    /// transacciones de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="codigoFactura">El código de la factura.</param>
+    /// <param name="codigoProducto">El código del producto.</param>
+    /// <param name="precio">El precio del producto relacionado con la factura.</param>
     public void InsertarFacturaProducto(string codigoFactura, string codigoProducto, decimal precio)
     {
         using MySqlConnection connection = GetConnection();
@@ -218,6 +293,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Elimina un cliente de la base de datos utilizando un procedimiento almacenado.
+    /// El ID del cliente se proporciona como parámetro. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="id">El ID del cliente que se eliminará.</param>
     public void BorrarCliente(int id)
     {
         using MySqlConnection connection = GetConnection();
@@ -247,6 +328,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Elimina una factura de la base de datos utilizando un procedimiento almacenado.
+    /// El código de factura se proporciona como parámetro. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="codigoFactura">El código de la factura que se eliminará.</param>
     public void BorrarFactura(string codigoFactura)
     {
         using MySqlConnection connection = GetConnection();
@@ -276,6 +363,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Elimina un tipo de producto de la base de datos utilizando un procedimiento almacenado.
+    /// El ID del tipo de producto se proporciona como parámetro. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="id">El ID del tipo de producto que se eliminará.</param>
     public void BorrarTipoProducto(int id)
     {
         using MySqlConnection connection = GetConnection();
@@ -305,6 +398,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Elimina un producto de la base de datos utilizando un procedimiento almacenado.
+    /// El código del producto se proporciona como parámetro. El método maneja transacciones
+    /// de base de datos y registra mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="codigoProducto">El código del producto que se eliminará.</param>
     public void BorrarProducto(string codigoProducto)
     {
         using MySqlConnection connection = GetConnection();
@@ -334,6 +433,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Elimina la relación entre un producto y una factura de la base de datos utilizando un procedimiento almacenado.
+    /// El ID de la relación se proporciona como parámetro. El método maneja transacciones de base de datos y registra
+    /// mensajes de éxito o fracaso utilizando un LogHandler.
+    /// </summary>
+    /// <param name="id">El ID de la relación entre producto y factura que se eliminará.</param>
     public void BorrarFacturaProducto(int id)
     {
         using MySqlConnection connection = GetConnection();
@@ -363,6 +468,12 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Obtiene una lista de clientes desde la base de datos utilizando un procedimiento almacenado.
+    /// El método maneja la conexión a la base de datos, ejecuta la consulta y mapea los resultados
+    /// a objetos de tipo Cliente. En caso de error, registra el problema utilizando un LogHandler.
+    /// </summary>
+    /// <returns>Una lista de objetos de tipo Cliente.</returns>
     public List<Cliente> ObtenerClientes()
     {
         List<Cliente> clientes = new();
@@ -397,6 +508,12 @@ public class DataManager
         return clientes;
     }
 
+    /// <summary>
+    /// Obtiene una lista de facturas desde la base de datos utilizando un procedimiento almacenado.
+    /// El método maneja la conexión a la base de datos, ejecuta la consulta y mapea los resultados
+    /// a objetos de tipo Factura. En caso de error, registra el problema utilizando un LogHandler.
+    /// </summary>
+    /// <returns>Una lista de objetos de tipo Factura.</returns>
     public List<Factura> ObtenerFacturas()
     {
         List<Factura> facturas = new();
@@ -432,6 +549,12 @@ public class DataManager
         return facturas;
     }
 
+    /// <summary>
+    /// Obtiene una lista de tipos de producto desde la base de datos utilizando un procedimiento almacenado.
+    /// El método maneja la conexión a la base de datos, ejecuta la consulta y mapea los resultados
+    /// a objetos de tipo TipoProducto. En caso de error, registra el problema utilizando un LogHandler.
+    /// </summary>
+    /// <returns>Una lista de objetos de tipo TipoProducto.</returns>
     public List<TipoProducto> ObtenerTiposProducto()
     {
         List<TipoProducto> tiposProducto = new();
@@ -462,6 +585,12 @@ public class DataManager
         return tiposProducto;
     }
 
+    /// <summary>
+    /// Obtiene una lista de productos desde la base de datos utilizando un procedimiento almacenado.
+    /// El método maneja la conexión a la base de datos, ejecuta la consulta y mapea los resultados
+    /// a objetos de tipo Producto. En caso de error, registra el problema utilizando un LogHandler.
+    /// </summary>
+    /// <returns>Una lista de objetos de tipo Producto.</returns>
     public List<Producto> ObtenerProductos()
     {
         List<Producto> productos = new();
@@ -495,6 +624,13 @@ public class DataManager
         return productos;
     }
 
+    /// <summary>
+    /// Obtiene una lista de relaciones entre facturas y productos desde la base de datos
+    /// utilizando un procedimiento almacenado. El método maneja la conexión a la base de datos,
+    /// ejecuta la consulta y mapea los resultados a objetos de tipo FacturaProducto. En caso
+    /// de error, registra el problema utilizando un LogHandler.
+    /// </summary>
+    /// <returns>Una lista de objetos de tipo FacturaProducto.</returns>
     public List<FacturaProducto> ObtenerFacturasProductos()
     {
         List<FacturaProducto> facturasProductos = new();
